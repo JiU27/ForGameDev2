@@ -9,6 +9,9 @@ TagManager:
   - BirdEyeView
   - 45EyeView
   - ThunderBall
+  - Treasure
+  - SilverTreasure
+  - GoldTreasure
   layers:
   - Default
   - TransparentFX

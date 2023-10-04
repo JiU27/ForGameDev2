@@ -15,7 +15,7 @@ public class StopGame : MonoBehaviour
     void QuitGame()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false; // 如果在Unity编辑器中运行，这将停止游戏播放模式
+        UnityEditor.EditorApplication.isPlaying = false; 
 #else
         Application.Quit(); // 如果在实际的游戏应用中运行，这将关闭游戏
 #endif
