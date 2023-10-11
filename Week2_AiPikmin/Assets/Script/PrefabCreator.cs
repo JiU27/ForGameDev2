@@ -4,41 +4,45 @@ using UnityEngine;
 
 public class PrefabCreator : MonoBehaviour
 {
-    public string targetTag = "x"; // 检测的标签
-    public GameObject spawnPrefab; // 你要创建的预制体
-    public float detectionRadius = 5.0f; // 检测半径
-    private GameObject spawnedObject; // 引用创建的对象
+    public GameObject prefabToCreate; // Assign the prefab to create in Unity Inspector
+    public float detectionRadius = 5f;
+    public string targetTag = "x";
+    private GameObject spawnedPrefab;
 
-    void Start()
+    void Update()
     {
-        // 确保你的检测器有一个球体触发器并且设置为触发模式
-        SphereCollider sphereCollider = GetComponent<SphereCollider>();
-        if (sphereCollider == null)
+        // Detect objects within radius
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, detectionRadius);
+
+        // Flag to check if target is in range
+        bool targetInRange = false;
+
+        foreach (var hitCollider in hitColliders)
         {
-            sphereCollider = gameObject.AddComponent<SphereCollider>();
+            // If a GameObject with the target tag is within range, set the flag to true and break the loop
+            if (hitCollider.CompareTag(targetTag))
+            {
+                targetInRange = true;
+                break;
+            }
         }
-        sphereCollider.isTrigger = true;
-        sphereCollider.radius = detectionRadius;
+
+        // If target is in range and prefab is not spawned, spawn it
+        if (targetInRange && spawnedPrefab == null)
+        {
+            spawnedPrefab = Instantiate(prefabToCreate, transform.position, Quaternion.identity);
+        }
+        // If target is out of range and prefab is spawned, destroy it
+        else if (!targetInRange && spawnedPrefab != null)
+        {
+            Destroy(spawnedPrefab);
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    // Optional: Visualize the detection radius in the Unity Editor
+    void OnDrawGizmos()
     {
-        // 如果进入检测区域的对象有正确的标签，并且当前没有创建的对象
-        if (other.CompareTag(targetTag) && spawnedObject == null)
-        {
-            // 创建一个预制体的实例
-            spawnedObject = Instantiate(spawnPrefab, transform.position, transform.rotation);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        // 如果离开检测区域的对象有正确的标签，并且当前有一个创建的对象
-        if (other.CompareTag(targetTag) && spawnedObject != null)
-        {
-            // 销毁该对象
-            Destroy(spawnedObject);
-            spawnedObject = null;
-        }
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 }
