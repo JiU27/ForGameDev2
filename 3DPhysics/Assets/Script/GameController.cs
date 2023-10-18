@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
 
     public GameState currentState = GameState.SettingDirection;
     public PointerController pointerController;
+    public PowerIndicatorController powerIndicatorController;
     private List<SelfDestruct> rings = new List<SelfDestruct>();
 
     public float spaceCooldownDuration = 0.5f;  // 设置为0.5秒，您可以根据需要调整
@@ -47,6 +48,8 @@ public class GameController : MonoBehaviour
                 {
                     currentState = GameState.WaitingForLaunch;
                     spaceCooldownTimer = spaceCooldownDuration;  // Set the cooldown
+                    powerIndicatorController.LockPower();
+
                 }
                 break;
 

@@ -958,6 +958,10 @@ PrefabInstance:
       propertyPath: spaceCooldownDuration
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 5057368281953131514, guid: 8a080d105cff2f24dadcb72992407f42, type: 3}
+      propertyPath: powerIndicatorController
+      value: 
+      objectReference: {fileID: 1727796579}
     - target: {fileID: 5431383004134932325, guid: 8a080d105cff2f24dadcb72992407f42, type: 3}
       propertyPath: m_Name
       value: MainControl
@@ -1903,7 +1907,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
       propertyPath: m_MaxValue
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5747505718619983612, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
       propertyPath: m_Name
@@ -1999,12 +2003,16 @@ PrefabInstance:
       objectReference: {fileID: 286994980}
     - target: {fileID: 8966128839515527392, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
       propertyPath: maxPower
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8966128839515527392, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
       propertyPath: gameController
       value: 
       objectReference: {fileID: 1021740929}
+    - target: {fileID: 8966128839515527392, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: powerChangeSpeed
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

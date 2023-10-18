@@ -148,6 +148,10 @@ PrefabInstance:
       propertyPath: spaceCooldownDuration
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 5057368281953131514, guid: 8a080d105cff2f24dadcb72992407f42, type: 3}
+      propertyPath: powerIndicatorController
+      value: 
+      objectReference: {fileID: 631301852}
     - target: {fileID: 5431383004134932325, guid: 8a080d105cff2f24dadcb72992407f42, type: 3}
       propertyPath: m_Name
       value: MainControl
@@ -592,6 +596,26 @@ PrefabInstance:
       propertyPath: m_MaxValue
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1053163547}
+    - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5054315596286851418, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 5747505718619983612, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -692,6 +716,10 @@ PrefabInstance:
       propertyPath: gameController
       value: 
       objectReference: {fileID: 176982020}
+    - target: {fileID: 8966128839515527392, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+      propertyPath: powerChangeSpeed
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -713,7 +741,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8966128839515527392, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
   m_PrefabInstance: {fileID: 631301850}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1053163547}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4880a7479f95f1141bcdb44478ca7e31, type: 3}
@@ -773,6 +801,11 @@ Transform:
   - {fileID: 832881614}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -12.772, z: 0}
+--- !u!1 &1053163547 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7900050144369376690, guid: 8cf417f9968a47d48a0e0f4067c7a4b4, type: 3}
+  m_PrefabInstance: {fileID: 631301850}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1179736049
 PrefabInstance:
   m_ObjectHideFlags: 0

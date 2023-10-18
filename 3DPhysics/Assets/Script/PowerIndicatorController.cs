@@ -27,6 +27,7 @@ public class PowerIndicatorController : MonoBehaviour
         {
             powerSlider.minValue = minPower;
             powerSlider.maxValue = maxPower;
+            powerSlider.value = currentPower;
         }
     }
 
@@ -41,6 +42,7 @@ public class PowerIndicatorController : MonoBehaviour
             }
 
             currentPower += powerChangeSpeed * Time.deltaTime * powerDirection;
+            currentPower = Mathf.Clamp(currentPower,minPower,maxPower);
 
             if (currentPower >= maxPower || currentPower <= minPower)
             {
@@ -59,7 +61,7 @@ public class PowerIndicatorController : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                LockPower();
+                //LockPower();
             }
         }
     }
