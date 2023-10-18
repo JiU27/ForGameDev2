@@ -1,56 +1,43 @@
 using UnityEngine;
-using TMPro;
 
 public class SelfDestruct : MonoBehaviour
 {
-    public TextMeshProUGUI scoreText; // [Will be removed]
     public float delayBeforeDestroy = 2f;
+    public GameObject prefabToSpawnOnCollision; // Reference to the prefab you want to spawn
 
-    private int score = 0;
     private bool hasScored = false;
-
     public bool isActive = true;
 
-    void Start()
-    {
-        scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
-        if (scoreText == null)
-        {
-            Debug.LogError("ScoreText not found in the scene.");
-        }
-    }
     private void OnCollisionEnter(Collision collision)
     {
-        // Check if collided object has the "Bowl" or "Bowl-1" tag and has not scored yet.
-        if ((collision.gameObject.tag == "Bowl") && !hasScored)
+        if (hasScored) return;
+
+        switch (collision.gameObject.tag)
         {
-            
-            AddScore(1); // Add score.
-            DestroyAfterDelay(); // Begin destroy sequence.
-        }
-        else if ((collision.gameObject.tag == "Bowl-2") && !hasScored)
-        {
-            
-            AddScore(1); // Add score.
-            DestroyAfterDelay(); // Begin destroy sequence.
-        }
-        // Check if collided object has the "Ground" tag.
-        else if (collision.gameObject.tag == "Ground")
-        {
-            DestroyAfterDelay(); // Begin destroy sequence.
+            case "Bowl":
+            case "Bowl-2":
+                SpawnPrefabAtCollisionPoint(collision.contacts[0].point); // Spawn the prefab at the collision point
+                DestroyAfterDelay();
+                break;
+
+            case "Ground":
+                SpawnPrefabAtCollisionPoint(collision.contacts[0].point); // Spawn the prefab at the collision point
+                DestroyAfterDelay();
+                break;
         }
     }
 
-    private void AddScore(int pointsToAdd)
+    private void SpawnPrefabAtCollisionPoint(Vector3 position)
     {
-        score += pointsToAdd;
-        scoreText.text = "Score: " + score.ToString();
+        if (prefabToSpawnOnCollision != null) // Safety check
+        {
+            Instantiate(prefabToSpawnOnCollision, position, Quaternion.identity);
+        }
     }
 
     private void DestroyAfterDelay()
     {
-        isActive = false; // Set isActive to false when destruction is triggered
-        // Destroys the object after specified delay.
+        isActive = false;
         Destroy(gameObject, delayBeforeDestroy);
     }
 }

@@ -13,12 +13,10 @@ public class PointerController : MonoBehaviour
     private float currentAngle = 0f;
     private int rotationDirection = 1;
     private Vector3 lockedDirection;
-    private Vector3 lineEndpoint;
 
     void Start()
     {
-        
-        transform.Rotate(new Vector3(-50f, 0f, 0f));
+        transform.Rotate(new Vector3(-60f, 0f, 0f));
         lockedDirection = transform.forward;
     }
 
@@ -26,19 +24,14 @@ public class PointerController : MonoBehaviour
     {
         if (gameController.currentState == GameController.GameState.SettingDirection && !isLocked)
         {
-            if (isLocked)
-            {
-                // 如果上一个状态锁定了力量，那么在回到这个状态时重置它。
-                //ResetAngle();
-            }
-
             currentAngle += rotationSpeed * Time.deltaTime * rotationDirection;
             if (currentAngle >= maxAngle || currentAngle <= minAngle)
             {
                 rotationDirection *= -1;
             }
 
-            transform.rotation = Quaternion.Euler(-50f, 0f, currentAngle);
+            transform.rotation = Quaternion.Euler(-60f, 0f, currentAngle);
+            Debug.DrawRay(transform.position, transform.forward);
 
             if (angleText != null)
             {
@@ -50,22 +43,14 @@ public class PointerController : MonoBehaviour
                 LockPointer();
             }
         }
-
-        
     }
 
     public void LockPointer()
     {
         isLocked = true;
-        lockedDirection = transform.forward;
-
-        // Rotate the lockedDirection 180 degrees around the y-axis
-        Quaternion yFlip = Quaternion.Euler(0f, 180f, 0f);
-        lockedDirection = yFlip * lockedDirection;
+        lockedDirection = transform.up;
 
         
-
-        Debug.Log("Pointer Locked! Expected line endpoint: " + lineEndpoint);  // Logging
 
         if (angleText != null)
         {
@@ -83,7 +68,6 @@ public class PointerController : MonoBehaviour
         isLocked = false;
         currentAngle = 0f;
 
-        
         if (angleText != null)
         {
             angleText.text = "Angle: " + currentAngle.ToString("F1");

@@ -16,8 +16,13 @@ public class PowerIndicatorController : MonoBehaviour
     private int powerDirection = 1;
     private float lockedPower;
 
+    //public bool IsLocked { get { return isLocked; } }
+
+
     void Start()
     {
+        currentPower = (maxPower - minPower) / 2;
+
         if (powerSlider != null)
         {
             powerSlider.minValue = minPower;
@@ -61,16 +66,22 @@ public class PowerIndicatorController : MonoBehaviour
 
     public void LockPower()
     {
-        isLocked = true;
-        lockedPower = currentPower;
-
-        if (powerText != null)
+        if (!isLocked) // 这个判断确保了力量只有在未被锁定时才被锁定
         {
-            powerText.text = "Locked Power: " + lockedPower.ToString("F1");
+            isLocked = true;
+            lockedPower = currentPower;
+
+            if (powerText != null)
+            {
+                powerText.text = "Locked Power: " + lockedPower.ToString("F1");
+            }
         }
+
+        //gameController.LaunchRing(); // 新增这一行来开始射击
     }
 
-    private void ResetPower()
+
+    public void ResetPower()
     {
         isLocked = false;
         currentPower = 0f;
@@ -88,5 +99,6 @@ public class PowerIndicatorController : MonoBehaviour
     public float GetLockedPower()
     {
         return lockedPower;
+        //Debug.Log("1");
     }
 }

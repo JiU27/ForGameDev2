@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro;  // 添加对 TextMeshPro 的引用
+using TMPro;
 using UnityEngine.SceneManagement;
 
 public class CountdownTimer : MonoBehaviour
@@ -7,6 +7,7 @@ public class CountdownTimer : MonoBehaviour
     public float timeRemaining = 10; // 设置倒计时时间（单位：秒）
     public TextMeshProUGUI timeText; // 使用 TextMeshProUGUI 替换 Text
     public bool timerIsRunning = false; // 控制计时器的开关
+    public int sceneIndexToLoad; // 您可以在Unity编辑器中设置此值作为要加载的场景索引
 
     private void Start()
     {
@@ -32,8 +33,8 @@ public class CountdownTimer : MonoBehaviour
                 timeRemaining = 0;
                 timerIsRunning = false;
 
-                // 重新加载场景
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                // 加载特定索引的场景
+                SceneManager.LoadScene(sceneIndexToLoad);
             }
         }
     }
