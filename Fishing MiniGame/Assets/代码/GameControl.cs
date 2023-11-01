@@ -4,10 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
+using UnityEditor;
 
 public class GameControl : MonoBehaviour
 {
-    // Enums
     public enum FishingStage
     {
         CastLine,
@@ -15,31 +16,32 @@ public class GameControl : MonoBehaviour
         TryingToCaught,
         ReelFish,
         FishCaught,
-        FishEscaped
+        FishEscaped,
+        Camera4
     }
 
+    // Public Variables
     public UIControl uiControl;
 
-    // Public fields
+    public ReelFish reelFishScript1;
+    public ReelFish reelFishScript2;
+    public ReelFish reelFishScript3;
+    public ReelFish[] reelFishScripts;
+    private int currentReelFishIndex;
+
+
     public FishingStage currentStage;
-    public GameObject floatObject, rob, fishPrefab, TurnTable;
+    public GameObject floatObject, rob, fishPrefab1, fishPrefab2, fishPrefab3;
     public TextMeshProUGUI fishCountText;
-    public TextMeshProUGUI reelFishTimerText;
-    public Slider fishEnergySlider;
+    public TextMeshProUGUI fishWeight;
+    public TextMeshProUGUI fishName;
+    public UnityEngine.UI.Slider fishEnergySlider;
     public float judgementTime = 5f;
     public float startTime = 4f;
     public float endTime = 2f;
 
-    public CinemachineVirtualCamera virtualCamera;
-    private Vector3 originalCameraPosition;
-
-    public float fishEnergyRecoveryRate = 1f;
-    public float fishEnergyDepletionRate = 2f;
-    public float reelSpeed = 4.0f;
-    public float reelFishTimeLimit = 30.0f;
-    public float reelFishTimer = 10f;
-
-    // Private fields
+    // Private Variables
+    private CameraControl cameraControl;
     private int fishCount;
     private float floatYRange = 0.05f;
     private float floatSpeed = 0.1f;
@@ -49,97 +51,151 @@ public class GameControl : MonoBehaviour
     private void Start()
     {
         InitializeGame();
+        cameraControl = FindObjectOfType<CameraControl>();
+        reelFishScripts = new ReelFish[] { reelFishScript1, reelFishScript2, reelFishScript3 };
+    }
+
+    private void Update()
+    {
+        HandleGameStages();
+        if (currentStage == FishingStage.FishEscaped)
+        {
+            cameraControl.HandleFishEscapedState();
+        }
+        else if (currentStage == FishingStage.CastLine)
+        {
+            cameraControl.HandleCastLineState();
+        }
     }
 
     private void InitializeGame()
     {
-        fishCount = Random.Range(1, 3);
+        fishCount = Random.Range(2, 4);
         fishCountText.text = "Fish count: " + fishCount;
         currentStage = FishingStage.CastLine;
-        originalCameraPosition = virtualCamera.transform.position;
-        reelFishTimer = 10f;
-        fishEnergySlider.value = fishEnergySlider.maxValue; // 假设滑动条的最大值代表鱼的最大精力
-        //floatOriginalPosition = floatObject.transform.position;
+        reelFishScript1.SetTime();
+        reelFishScript2.SetTime();
+        reelFishScript3.SetTime();
+        fishEnergySlider.value = fishEnergySlider.maxValue;
     }
 
-    private void Update()
+    public void HandleGameStages()
     {
         switch (currentStage)
         {
             case FishingStage.CastLine:
                 uiControl.CastLine();
                 if (fishCount <= 0)
-                {
-                    // 游戏结束
-                    fishCountText.text = "All fish caught!";
+                {               
+                    fishCountText.text = "All fish caught! Press R to reset.";
 
                     if (Input.GetKeyDown(KeyCode.R))
                     {
-                        // 重新加载索引为0的场景
                         SceneManager.LoadScene(0);
                     }
                 }
                 else
                 {
-                    if (Input.GetMouseButtonDown(0))
+                    if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
                     {
                         StartCoroutine(FloatAnimation());
                         StartCoroutine(RobCastAnimation());
                     }
                 }
-                
                 break;
+
             case FishingStage.WaitForFish:
                 HandleFloatMovement();
                 break;
+
             case FishingStage.TryingToCaught:
+                cameraControl.ApproachFloatObject();
                 uiControl.TryingToCaught(judgementTime, startTime, endTime);
                 HandleFishTryingToBeCaught();
                 break;
-            case FishingStage.ReelFish:
-                
-                uiControl.ReelFish();
-                HandleReelFish();
-                break;
-        }
 
-        if (currentStage == FishingStage.TryingToCaught)
-        {
-            virtualCamera.transform.position = Vector3.MoveTowards(virtualCamera.transform.position, floatObject.transform.position, 0.2f * Time.deltaTime);
+            case FishingStage.ReelFish:
+                uiControl.ReelFish();
+                reelFishScripts[currentReelFishIndex].HandleReelFish();
+                break;
+
+            case FishingStage.Camera4:
+                uiControl.Camera4();
+                cameraControl.SwitchToCamera4();
+                if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
+                {
+                    SwitchStage(FishingStage.CastLine);
+                }
+                break;
         }
     }
 
-    private void SwitchStage(FishingStage nextStage)
+    public void SwitchStage(FishingStage nextStage)
     {
         StopCoroutine(WaitForFishToBite(0));
 
         if (nextStage == FishingStage.TryingToCaught)
         {
             tryingToCaughtStartTime = Time.time;
-            judgementTime = 3f;  // 重设倒计时时间
+            judgementTime = 3f; 
         }
         else if (nextStage == FishingStage.WaitForFish)
         {
-            float randomWaitTime = Random.Range(5.0f, 10.0f);  // 您可以根据需要更改此范围
+            float randomWaitTime = Random.Range(4f, 8f); 
             StartCoroutine(WaitForFishToBite(randomWaitTime));
         }
-        else if(nextStage == FishingStage.ReelFish)
+        else if (nextStage == FishingStage.ReelFish)
         {
-            reelFishTimer = 10f;
+            currentReelFishIndex = Random.Range(0, reelFishScripts.Length);
+            reelFishScripts[currentReelFishIndex].BoolSet();
+            reelFishScripts[currentReelFishIndex].SetTime();
             fishEnergySlider.value = fishEnergySlider.maxValue;
         }
+        else if (nextStage == FishingStage.Camera4)
+        {
+            switch (currentReelFishIndex)
+            {
+                case 0:
+                    fishName.text = "Normal Fish";
+                    fishWeight.text = Random.Range(4f, 5.5f).ToString("F1") + "in";
+                    break;
+                case 1:
+                    fishName.text = "Little Fish";
+                    fishWeight.text = Random.Range(2f, 3.5f).ToString("F1") + "in";
+                    break;
+                case 2:
+                    fishName.text = "Shake";
+                    fishWeight.text = Random.Range(11f, 16f).ToString("F1") + "in";
+                    break;
+            }
+        }
+
 
         currentStage = nextStage;
         switch (nextStage)
         {
             case FishingStage.FishCaught:
+                GameObject fishPrefab = null;
+                switch (currentReelFishIndex)
+                {
+                    case 0:
+                        fishPrefab = fishPrefab1;
+                        break;
+                    case 1:
+                        fishPrefab = fishPrefab2;
+                        break;
+                    case 2:
+                        fishPrefab = fishPrefab3;
+                        break;
+                }
                 Instantiate(fishPrefab, floatObject.transform.position, Quaternion.identity);
-                StartCoroutine(MoveFloatToStartPosition());
+                StartCoroutine(MoveFloatToStartPosition1());
                 fishCount--;
                 fishCountText.text = "Fish count: " + fishCount;
                 break;
+
             case FishingStage.FishEscaped:
-                StartCoroutine(MoveFloatToStartPosition());
+                StartCoroutine(MoveFloatToStartPosition2());
                 break;
         }
     }
@@ -183,15 +239,15 @@ public class GameControl : MonoBehaviour
 
     System.Collections.IEnumerator RobCastAnimation()
     {
-        // 旋转动画的持续时间
-        float animationDuration = 2.0f; // 您可以根据需要修改这个值
+        
+        float animationDuration = 2.0f; 
 
-        // 开始和结束的旋转角度
+        
         Quaternion startRotation = rob.transform.rotation;
         Quaternion midRotation = Quaternion.Euler(0, 0, 10);
         Quaternion endRotation = Quaternion.Euler(0, 0, 50);
 
-        // 第一个阶段的旋转
+        
         for (float t = 0; t < 1; t += Time.deltaTime / (animationDuration / 2))
         {
             rob.transform.rotation = Quaternion.Lerp(startRotation, midRotation, t);
@@ -199,7 +255,7 @@ public class GameControl : MonoBehaviour
         }
         rob.transform.rotation = midRotation;
 
-        // 第二个阶段的旋转
+        
         for (float t = 0; t < 1; t += Time.deltaTime / (animationDuration / 2))
         {
             rob.transform.rotation = Quaternion.Lerp(midRotation, endRotation, t);
@@ -207,7 +263,7 @@ public class GameControl : MonoBehaviour
         }
         rob.transform.rotation = endRotation;
 
-        // 进入下一个状态
+        
         SwitchStage(FishingStage.WaitForFish);
     }
 
@@ -235,14 +291,21 @@ public class GameControl : MonoBehaviour
         judgementTime -= Time.deltaTime;
         Debug.Log($"Remaining Judgement Time: {judgementTime}");
 
+        if (judgementTime > startTime && judgementTime < endTime)
+        {
+            cameraControl.SwitchToCamera2();
+        }
+
         if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Input Detected (Mouse or Space)");
-            ResetCameraPosition();
+            
 
             if (judgementTime > startTime && judgementTime < endTime)
             {
+
                 Debug.Log("Switching to ReelFish Stage");
+
                 SwitchStage(FishingStage.ReelFish);
             }
             else
@@ -254,51 +317,16 @@ public class GameControl : MonoBehaviour
         else if (judgementTime <= 0)
         {
             Debug.Log("Switching to FishEscaped Stage (due to exceeding judgement time)");
-            ResetCameraPosition();
+            
             SwitchStage(FishingStage.FishEscaped);
         }
     }
 
-
-    private void HandleReelFish()
-    {
-        if (Input.GetKey(KeyCode.A))
-        {
-            TurnTable.transform.Rotate(Vector3.back * reelSpeed);
-            fishEnergySlider.value -= fishEnergyDepletionRate;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            TurnTable.transform.Rotate(Vector3.forward * reelSpeed);
-            fishEnergySlider.value -= fishEnergyDepletionRate;
-        }
-        else
-        {
-            fishEnergySlider.value += fishEnergyRecoveryRate;
-        }
-
-        reelFishTimer -= Time.deltaTime;
-
-        if (fishEnergySlider.value <= 0)
-        {
-            SwitchStage(FishingStage.FishCaught);
-        }
-        else if (reelFishTimer < reelFishTimeLimit)
-        {
-            SwitchStage(FishingStage.FishEscaped);
-        }
-
-        float lerpFactor = 1f - (fishEnergySlider.value / fishEnergySlider.maxValue);
-        floatObject.transform.position = Vector3.Lerp(floatOriginalPosition, new Vector3(-14, -0.15f, 0.2f), lerpFactor);
-        reelFishTimerText.text = reelFishTimer.ToString("F2");
-
-    }
-
-    private IEnumerator MoveFloatToStartPosition()
+    private IEnumerator MoveFloatToStartPosition1()
     {
         Vector3 startPosition = floatObject.transform.position;
         Vector3 endPosition = new Vector3(-12, 2, 0.5f);
-        float duration = 0.5f;  // 您可以根据需要更改此值
+        float duration = 0.5f;
 
         for (float t = 0; t < 1; t += Time.deltaTime / duration)
         {
@@ -306,13 +334,25 @@ public class GameControl : MonoBehaviour
             yield return null;
         }
 
-        
-            SwitchStage(FishingStage.CastLine);
+        SwitchStage(FishingStage.Camera4);
+
+    }
+
+
+    private IEnumerator MoveFloatToStartPosition2()
+    {
+        Vector3 startPosition = floatObject.transform.position;
+        Vector3 endPosition = new Vector3(-12, 2, 0.5f);
+        float duration = 0.5f;
+
+        for (float t = 0; t < 1; t += Time.deltaTime / duration)
+        {
+            floatObject.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            yield return null;
+        }
+
+        SwitchStage(FishingStage.CastLine);
         
     }
 
-    private void ResetCameraPosition()
-    {
-        virtualCamera.transform.position = originalCameraPosition;
-    }
 }
